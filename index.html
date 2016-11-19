@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+	<head>
+		<!-- Angular -->
+		<script src="bower_components/angular/angular.js"></script>
+
+		<!-- Non angular libs -->
+		<script src='https://maps.googleapis.com/maps/api/js?libraries=places'></script>
+		<script src="bower_components/tween.js/src/Tween.js"></script>
+
+		<!-- Libraries -->
+		<script src="bower_components/lodash/lodash.min.js"></script>
+		<script src='bower_components/angular-simple-logger/dist/angular-simple-logger.min.js'></script>
+		<script src='bower_components/angular-google-maps/dist/angular-google-maps.min.js'></script>
+		<script src='https://sparkalow.github.io/angular-count-to/js/angular-count-to.js'></script>
+		<link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+		<script src='autocomplete.js'></script>
+		<link rel="stylesheet" href="autocomplete.css">
+
+		<style>
+			.angular-google-map-container { height: 550px; width: 100%;}
+			* {
+				padding: 0; margin: 0;
+				border: 0; outline: 0 !important;
+				box-sizing: border-box;
+			}
+		</style>
+	</head>
+	<body ng-app="grass-routes" style="background: #2ECC71; color: white; font-family: 'Quicksand', sans-serif;">
+		<div ng-controller="mapController" class="container-fluid" style="padding:0;">
+			<div style="position: absolute; left: 15px;">
+				<h2><span count-to="{{treeData.length}}" value="0" duration="5"></span> Trees (and counting)</h2>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<h1 class="h1 text-center" style="font-weight: regular; margin-bottom: 20px;">Grass<strong>Routes</strong></h1>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<ui-gmap-google-map center='map.center' zoom='map.zoom' control='map.control'>
+						<ui-gmap-markers models="treeMarkers" coords="'self'" icon="'icon'" idKey="'id'" />
+					</ui-gmap-google-map>
+				</div>
+			</div>
+			<br />
+			<div class="row">
+				<div class="col-xs-4 col-xs-offset-2" style="margin-left: 13%">
+					<input class="form-control" type="text" g-places-autocomplete ng-model="start" placeholder="start" />
+				</div>
+				<div class="col-xs-4">
+					<input class="form-control" type="text" g-places-autocomplete ng-model="end" placeholder="end" />
+				</div>
+				<div class="col-xs-1">
+					<button class="btn btn-default" ng-click="showDirections(start, end)" style="background: transparent; color: white; border-color: white;">GO</button>
+				</div>
+			</div>
+		</div>
+		<script>
+			angular.module('grass-routes', [
+				'uiGmapgoogle-maps', 'google.places', 'countTo'
+			]);
+
+			angular.module('grass-routes').controller('mapController', function($scope, $http){
+				$scope.map = { center: { latitude: 51.5074, longitude: 0.1278 }, zoom: 12, control: {} };
+
+				$http.get('http://192.168.108.90/api/get_trees.php').then(function(res) {
+					$scope.treeData = res.data;
+					$scope.treeMarkers = res.data.map(function (tree) {
+						return {
+							id: tree.id,
+							latitude: tree.lat,
+							longitude: tree.lng,
+							icon: '🌳.png'
+						};
+					});
+					console.log($scope.treeData[0])
+				}).catch(function(err){
+					console.log('mapController', err)
+				});
+
+				$scope.showDirections = function(start, end) {
+
+					var directionsService = new google.maps.DirectionsService();
+					var directionsRequest = {
+						origin: start.geometry.location,
+						destination: end.geometry.location,
+						optimizeWaypoints: true,
+						travelMode: google.maps.TravelMode.WALKING
+					};
+
+					directionsService.route(directionsRequest, function (response, status) {
+						if (status === google.maps.DirectionsStatus.OK) {
+							var map = $scope.map.control.getGMap();
+							if ($scope.directionsDisplay) {
+								$scope.directionsDisplay.setMap(null);
+							}
+							$scope.directionsDisplay = new google.maps.DirectionsRenderer({
+								map: map,
+								directions: response,
+								suppressMarkers: false
+							});
+
+							// var leg = response.routes[0].legs[0];
+							// setMarker(0,leg.start_location, $scope.icons.start, 'title');
+							// setMarker(1,leg.end_location, $scope.icons.end, 'title');
+
+						} else {
+							$log.error('Request failed: ' + status);
+						}
+					});
+				}
+
+			});
+		</script>
+	</body>
+</html>
