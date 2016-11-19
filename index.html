@@ -12,12 +12,12 @@
 		<script src="bower_components/lodash/lodash.min.js"></script>
 		<script src='bower_components/angular-simple-logger/dist/angular-simple-logger.min.js'></script>
 		<script src='bower_components/angular-google-maps/dist/angular-google-maps.min.js'></script>
-		<script src='https://sparkalow.github.io/angular-count-to/js/angular-count-to.js'></script>
-		<link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src='count-to.js'></script>
+		<script src='bower_components/angular-google-places-autocomplete/src/autocomplete.js'></script>
 
-		<script src='autocomplete.js'></script>
-		<link rel="stylesheet" href="autocomplete.css">
+		<link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
+		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="bower_components/angular-google-places-autocomplete/src/autocomplete.css">
 
 		<style>
 			.angular-google-map-container { height: 550px; width: 100%;}
@@ -31,7 +31,7 @@
 	<body ng-app="grass-routes" style="background: #2ECC71; color: white; font-family: 'Quicksand', sans-serif;">
 		<div ng-controller="mapController" class="container-fluid" style="padding:0;">
 			<div style="position: absolute; left: 15px;">
-				<h2><span count-to="{{treeData.length}}" value="0" duration="5"></span> Trees (and counting)</h2>
+				<h2>{{treeData.length}} Trees (and counting)</h2>
 			</div>
 			<div class="row">
 				<div class="col-xs-12">
@@ -60,7 +60,7 @@
 		</div>
 		<script>
 			angular.module('grass-routes', [
-				'uiGmapgoogle-maps', 'google.places', 'countTo'
+				'uiGmapgoogle-maps', 'google.places'
 			]);
 
 			angular.module('grass-routes').controller('mapController', function($scope, $http){

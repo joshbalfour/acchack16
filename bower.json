@@ -1,0 +1,21 @@
+{
+  "name": "acchack16",
+  "description": "",
+  "main": "",
+  "authors": [
+  ],
+  "license": "MIT",
+  "moduleType": [],
+  "dependencies": {
+    "bootstrap": "~3.3.5",
+    "angular": "~1.4.7",
+    "angular-google-maps": "https://github.com/angular-ui/angular-google-maps.git#^2.3.2",
+    "tween.js": "tweenjs#v16.3.0",
+    "lodash": "~3.*",
+    "angular-simple-logger":"0.1.7",
+    "angular-google-places-autocomplete": "0.2.7"
+  },
+  "resolutions": {
+    "angular": "1.4.7"
+  }
+}
