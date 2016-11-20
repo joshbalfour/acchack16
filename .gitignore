@@ -4,3 +4,4 @@ trees.json
 .DS_STORE
 *.sh
 index.php
+bower_components/

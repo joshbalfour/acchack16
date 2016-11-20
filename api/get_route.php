@@ -22,11 +22,14 @@ try {
 
 try {
 	$data = file_get_contents("http://router.project-osrm.org/route/v1/walking/" . $start['lon'] . "," . $start['lat'] . ";" . $end['lon'] . "," . $end['lat'] ."?alternatives=true&steps=true&geometries=geojson&overview=full&annotations=true");
+	$data = json_decode($data, true);
+	if($data['code'] != "Ok"){
+		$sitetools->http_error(400, "Malformed JSON inputs");	
+	}
 } catch (Exception $e) {
 	$sitetools->http_error(400, "Malformed JSON inputs");
 }
 
-$data = json_decode($data, true);
 $steps = [];
 foreach ($data['routes'][1]['legs'][0]['steps'] as $key => $value) {
 	array_push($steps, $value);

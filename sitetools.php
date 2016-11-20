@@ -24,7 +24,7 @@ class sitetools{
 
     public function http_error($code, $message){
     	http_response_code($code);
-		echo json_encode(['status'=>['error' => $code, 'message' => $message]]);
+		echo json_encode(['status'=>['code' => $code, 'message' => $message]]);
 		exit;
     }
 
