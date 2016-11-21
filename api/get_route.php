@@ -10,12 +10,12 @@ $db = $sitetools->connect();
 
 array_map('htmlspecialchars', $_GET);
 
-if(empty($_GET['start']) || empty($_GET['end'])){
+if(empty($_GET['start_lat']) || empty($_GET['end_lat']) || empty($_GET['start_lng']) || empty($_GET['end_lng'])){
 	$sitetools->http_error(422, "Missing required parameter");
 }
 try {
-	$start = json_decode($_GET['start'], true);
-	$end = json_decode($_GET['end'], true);
+	$start = ["lat" => round($_GET['start_lat'], 7), "lon" => round($_GET['start_lng'], 7)];
+	$end = ["lat" => round($_GET['end_lat'], 7), "lon" => round($_GET['end_lng'], 7)];
 } catch (Exception $e) {
 	$sitetools->http_error(422, "Malformed JSON inputs");
 }
@@ -23,6 +23,7 @@ try {
 try {
 	$data = file_get_contents("http://router.project-osrm.org/route/v1/walking/" . $start['lon'] . "," . $start['lat'] . ";" . $end['lon'] . "," . $end['lat'] ."?alternatives=true&steps=true&geometries=geojson&overview=full&annotations=true");
 	$data = json_decode($data, true);
+
 	if($data['code'] != "Ok"){
 		$sitetools->http_error(400, "Malformed JSON inputs");	
 	}
@@ -31,13 +32,14 @@ try {
 }
 
 $steps = [];
-foreach ($data['routes'][1]['legs'][0]['steps'] as $key => $value) {
+foreach ($data['routes'][0]['legs'][0]['steps'] as $key => $value) {
 	array_push($steps, $value);
 }
 
 //prepare the query
 $get = $db->prepare("SELECT (`id`) FROM `trees-sanitised` WHERE `lat` LIKE :lat AND `lng` LIKE :lon");
 $all_the_trees = [];
+
 foreach ($steps as $key => $value) {
 	$lat = "%" . round($value['geometry']['coordinates'][0][0], 2) . "%";
 	$lon = "%" . round($value['geometry']['coordinates'][0][1], 2) . "%";
@@ -57,7 +59,7 @@ $no_trees = count($all_the_trees);
 
 $return = 
 ['status' => [
-	"error" => 200,
+	"code" => 200,
 	"message" => "success"
 ],
 'result' => [
